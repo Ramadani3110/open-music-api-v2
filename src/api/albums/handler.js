@@ -77,6 +77,7 @@ class AlbumsHandler {
         message: "Maaf terjadi kesalahan di server kami",
       });
       response.code(500);
+      console.error(error);
       return response;
     }
   }

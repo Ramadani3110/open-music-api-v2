@@ -15,6 +15,7 @@
     "@eslint/eslintrc": "^2.1.4",
     "@hapi/hapi": "^21.3.2",
     "@hapi/jwt": "^3.2.0",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "eslintrc": "^1.0.6",
     "joi": "^17.11.0",

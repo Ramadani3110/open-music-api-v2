@@ -1,17 +1,36 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 require("dotenv").config();
+// hapi
 const Hapi = require("@hapi/hapi");
+const Jwt = require("@hapi/jwt");
+
+// albums
 const albums = require("./api/albums");
-const songs = require("./api/songs");
 const AlbumsService = require("./service/postgres/AlbumsService");
-const SongsService = require("./service/postgres/SongsService");
 const AlbumsValidator = require("./validator/music/albums");
+
+// songs
+const songs = require("./api/songs");
+const SongsService = require("./service/postgres/SongsService");
 const SongsValidator = require("./validator/music/songs");
+
+// users
+const users = require("./api/users");
+const UsersService = require("./service/postgres/UsersService");
+const UsersValidator = require("./validator/music/users");
+
+// authentications
+const authentications = require("./api/authentications");
+const AuthenticationsService = require("./service/postgres/AuthenticationsService");
+const AuthenticationsValidator = require("./validator/music/authentication");
+const TokenManager = require("./tokenize/TokenManager");
 
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
+  const usersService = new UsersService();
+  const authenticationsService = new AuthenticationsService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -35,6 +54,22 @@ const init = async () => {
       options: {
         service: songsService,
         validator: SongsValidator,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UsersValidator,
+      },
+    },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
       },
     },
   ]);

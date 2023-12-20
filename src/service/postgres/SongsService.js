@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable comma-dangle */
 /* eslint-disable object-curly-newline */
 /* eslint-disable class-methods-use-this */
@@ -63,11 +64,11 @@ class SongsService {
 
   async editSongsById(
     id,
-    { title, year, performer, genre, duration, albumId }
+    { title, year, performer, genre, duration, album_id }
   ) {
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, "albumId" = $6 WHERE id = $7 RETURNING id',
-      values: [title, year, performer, genre, duration, albumId, id],
+      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, "album_id" = $6 WHERE id = $7 RETURNING id',
+      values: [title, year, performer, genre, duration, album_id, id],
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
