@@ -85,7 +85,10 @@ class PlaylistHandler {
     try {
       const { id } = request.params;
       const { id: credentialsId } = request.auth.credentials;
-      await this._service.verifyPlaylistOwner({ id, owner: credentialsId });
+      await this._service.verifyPlaylistOwner({
+        id,
+        owner: credentialsId,
+      });
       await this._service.deletePlaylistById(id);
 
       return {
@@ -93,6 +96,7 @@ class PlaylistHandler {
         message: "Berhasil menghapus playlist",
       };
     } catch (error) {
+      console.error(error);
       if (error instanceof ClientError) {
         const response = h.response({
           status: "fail",
@@ -124,6 +128,12 @@ class PlaylistHandler {
         owner: credentialsId,
       });
       await this._service.addSongToPlaylist({ songId, playlistId });
+      await this._service.addActivities({
+        playlistId,
+        songId,
+        owner: credentialsId,
+        action: "add",
+      });
       const response = h.response({
         status: "success",
         message: "Berhasil menambahkan lagu ke playlist",
@@ -204,11 +214,57 @@ class PlaylistHandler {
         owner: credentialsId,
       });
       await this._service.deleteSongInPlaylist({ songId, playlistId });
+      await this._service.addActivities({
+        playlistId,
+        songId,
+        owner: credentialsId,
+        action: "delete",
+      });
 
       return {
         status: "success",
         message: "Lagu berhasil di hapus dari playlists",
       };
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: "fail",
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      //   server error
+      const response = h.response({
+        status: "error",
+        message: "Maaf terjadi kesalahan di server kami",
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  async getActivitiesHandler(request, h) {
+    try {
+      const { id } = request.params;
+      const { id: credentialsId } = request.auth.credentials;
+
+      await this._service.verifyPlaylistOwner({
+        id,
+        owner: credentialsId,
+      });
+      const activities = await this._service.getActivitiesById(id);
+
+      const response = h.response({
+        status: "success",
+        data: {
+          playlistId: id,
+          activities,
+        },
+      });
+      response.code(200);
+      return response;
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({
